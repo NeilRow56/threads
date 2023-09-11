@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { UserValidation } from '@/lib/validations/users'
 import Image from 'next/image'
 import { ChangeEvent } from 'react'
+import { Textarea } from '../ui/textarea'
 
 interface Props {
   user: {
@@ -54,8 +55,8 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col justify-start gap-10"
+        onSubmit={form.handleSubmit(onSubmit)}
       >
         <FormField
           control={form.control}
@@ -66,7 +67,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                 {field.value ? (
                   <Image
                     src={field.value}
-                    alt="profile photo"
+                    alt="profile_icon"
                     width={96}
                     height={96}
                     priority
@@ -75,7 +76,7 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
                 ) : (
                   <Image
                     src="/assets/profile.svg"
-                    alt="profile photo"
+                    alt="profile_icon"
                     width={24}
                     height={24}
                     className="object-contain"
@@ -85,8 +86,8 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
               <FormControl className="flex-1 text-base-semibold text-gray-200">
                 <Input
                   type="file"
-                  accept="image"
-                  placeholder="Upload a photo"
+                  accept="image/*"
+                  placeholder="Add profile photo"
                   className="account-form_image-input"
                   onChange={(e) => handleImage(e, field.onChange)}
                 />
@@ -94,8 +95,69 @@ const AccountProfile = ({ user, btnTitle }: Props) => {
             </FormItem>
           )}
         />
-        <Button className="bg-purple-500" type="submit">
-          Submit
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col gap-3">
+              <FormLabel className="text-base-semibold text-light-2">
+                Name
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  className="account-form_input no-focus"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="username"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col gap-3">
+              <FormLabel className="text-base-semibold text-light-2">
+                Username
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="text"
+                  className="account-form_input no-focus"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="bio"
+          render={({ field }) => (
+            <FormItem className="flex w-full flex-col gap-3">
+              <FormLabel className="text-base-semibold text-light-2">
+                Bio
+              </FormLabel>
+              <FormControl>
+                <Textarea
+                  rows={5}
+                  className="account-form_input no-focus"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" className="bg-primary-500">
+          {btnTitle}
         </Button>
       </form>
     </Form>
