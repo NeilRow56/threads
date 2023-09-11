@@ -1,12 +1,15 @@
 'use client'
 
-import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import Image from 'next/image'
+import { useForm } from 'react-hook-form'
+import { usePathname, useRouter } from 'next/navigation'
+import { ChangeEvent, useState } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
+
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -14,10 +17,8 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 import { UserValidation } from '@/lib/validations/users'
-import Image from 'next/image'
-import { ChangeEvent } from 'react'
-import { Textarea } from '../ui/textarea'
 
 interface Props {
   user: {
@@ -32,24 +33,61 @@ interface Props {
 }
 
 const AccountProfile = ({ user, btnTitle }: Props) => {
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const [files, setFiles] = useState<File[]>([])
+
   const form = useForm<z.infer<typeof UserValidation>>({
     resolver: zodResolver(UserValidation),
     defaultValues: {
-      profile_photo: '',
-      name: '',
-      username: '',
-      bio: '',
+      profile_photo: user?.image ? user.image : '',
+      name: user?.name ? user.name : '',
+      username: user?.username ? user.username : '',
+      bio: user?.bio ? user.bio : '',
     },
   })
 
-  const handleImage = (e: ChangeEvent, fieldChane: (value: string) => void) => {
-    e.preventDefault()
+  const onSubmit = async (values: z.infer<typeof UserValidation>) => {
+    const blob = values.profile_photo
+
+    // await updateUser({
+    //   name: values.name,
+    //   path: pathname,
+    //   username: values.username,
+    //   userId: user.id,
+    //   bio: values.bio,
+    //   image: values.profile_photo,
+    // });
+
+    if (pathname === '/profile/edit') {
+      router.back()
+    } else {
+      router.push('/')
+    }
   }
 
-  function onSubmit(values: z.infer<typeof UserValidation>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values)
+  const handleImage = (
+    e: ChangeEvent<HTMLInputElement>,
+    fieldChange: (value: string) => void
+  ) => {
+    e.preventDefault()
+
+    const fileReader = new FileReader()
+
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0]
+      setFiles(Array.from(e.target.files))
+
+      if (!file.type.includes('image')) return
+
+      fileReader.onload = async (event) => {
+        const imageDataUrl = event.target?.result?.toString() || ''
+        fieldChange(imageDataUrl)
+      }
+
+      fileReader.readAsDataURL(file)
+    }
   }
 
   return (
